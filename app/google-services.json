@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "915458720232",
+    "firebase_url": "https://fridgeit-32411.firebaseio.com",
+    "project_id": "fridgeit-32411",
+    "storage_bucket": "fridgeit-32411.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915458720232:android:3532448015c9e1af",
+        "android_client_info": {
+          "package_name": "gridentertainment.net.fridgeit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "915458720232-65a9c7fn16uj97b6ea2nhpep6tdp9dht.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "gridentertainment.net.fridgeit",
+            "certificate_hash": "617a7277095517c7a08cf2a9bb2a05aff30590cf"
+          }
+        },
+        {
+          "client_id": "915458720232-2o7lvgmbu5mhme8ulqgaj0ork746g6am.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOyxw-_KVJZQkNhmQRpbSHkngnCDqYab4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "915458720232-2o7lvgmbu5mhme8ulqgaj0ork746g6am.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
