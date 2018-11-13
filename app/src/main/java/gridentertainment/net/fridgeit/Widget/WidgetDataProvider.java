@@ -1,5 +1,7 @@
 package gridentertainment.net.fridgeit.Widget;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -23,6 +25,7 @@ import gridentertainment.net.fridgeit.R;
 
 public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
+    private final Intent intent;
     private ArrayList<InventoryItem> iv = new ArrayList<>();
     private Context context;
 
@@ -44,16 +47,20 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for(DataSnapshot dataSnapshot1 :dataSnapshot.getChildren()){
+
                         InventoryItem inventoryItems = dataSnapshot1.getValue(InventoryItem.class);
                         InventoryItem listdata = new InventoryItem();
+
                         String name = inventoryItems.getName();
                         String quantity = inventoryItems.getQuantity();
                         String address=inventoryItems.getExpiryDate();
                         String price=inventoryItems.getPrice();
+
                         listdata.setName(name);
                         listdata.setQuantity(quantity);
                         listdata.setExpiryDate(address);
                         listdata.setPrice(price);
+
                         Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
                         iv.add(listdata);
                     }
@@ -69,8 +76,10 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
         }
     }
 
-    public WidgetDataProvider(Context context) {
+    public WidgetDataProvider(Context context, Intent intent)
+    {
         this.context = context;
+        this.intent = intent;
     }
 
     @Override

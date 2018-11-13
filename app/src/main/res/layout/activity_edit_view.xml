@@ -37,7 +37,7 @@
         android:id="@+id/ed_quantityedit"
         android:layout_width="353dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="3dp"
         android:contentDescription="@string/cnt_quantity"
         android:ems="10"
         android:hint="@string/hint_quantity"

@@ -2,15 +2,23 @@ package gridentertainment.net.fridgeit.UI;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,6 +33,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 import gridentertainment.net.fridgeit.Adapter.InvAdapter;
 import gridentertainment.net.fridgeit.Models.InventoryItem;
@@ -37,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     List<InventoryItem> inventoryItemList;
     RecyclerView recyclerView;
     boolean doubleBackToExitPressedOnce = false;
+    InvAdapter recycler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         if(savedInstanceState==null)
         {
-            database.getInstance().setPersistenceEnabled(true);
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         }
         databaseReference = database.getReference(userID).child("items");
         final ProgressDialog nDialog;
@@ -88,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                     inventoryItemList.add(listdata);
                 }
 
-                InvAdapter recycler = new InvAdapter(inventoryItemList);
+                recycler = new InvAdapter(inventoryItemList);
                 RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MainActivity.this);
                 recyclerView.setLayoutManager(layoutmanager);
                 recyclerView.setItemAnimator( new DefaultItemAnimator());
@@ -127,10 +137,41 @@ public class MainActivity extends AppCompatActivity {
 
                     query.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
+                        public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                            final java.util.Timer timer = new Timer();
+                            Snackbar snackbar = Snackbar
+                                    .make(recyclerView, "Remove Item?", Snackbar.LENGTH_LONG)
+                                    .setAction("Undo", new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            recycler.notifyDataSetChanged();
+                                        }
+                                    })
+                                    .setCallback(new Snackbar.Callback() {
+                                        @Override
+                                        public void onDismissed(Snackbar snackbar, int event) {
+                                            super.onDismissed(snackbar, event);
+                                                if (event != DISMISS_EVENT_ACTION) {
+                                                    for (DataSnapshot appleSnapshot : dataSnapshot.getChildren()) {
+                                                        appleSnapshot.getRef().removeValue();
+                                                    }
+                                            }
+                                        }
+                                    });
+                            snackbar.show();
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot appleSnapshot : dataSnapshot.getChildren()) {
-                                appleSnapshot.getRef().removeValue();
-                            }
+
                         }
 
                         @Override
