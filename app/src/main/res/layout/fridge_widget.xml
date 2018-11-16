@@ -8,7 +8,6 @@
         android:id="@+id/widget_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Title"
         android:textSize="25sp"
         android:textColor="#ffffff"
         android:gravity="center"
@@ -20,5 +19,4 @@
         android:id="@+id/listViewWidget"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-</LinearLayout>
+w</LinearLayout>

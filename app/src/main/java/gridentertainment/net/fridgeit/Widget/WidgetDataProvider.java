@@ -19,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import gridentertainment.net.fridgeit.Models.InventoryItem;
 import gridentertainment.net.fridgeit.R;
@@ -26,18 +27,17 @@ import gridentertainment.net.fridgeit.R;
 public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
     private final Intent intent;
-    private ArrayList<InventoryItem> iv = new ArrayList<>();
+    private List<InventoryItem> iv = new ArrayList<>();
     private Context context;
 
     private void initializeData() throws NullPointerException {
 
-        FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        String userID = currentFirebaseUser.getUid();
 
         try {
+
             iv.clear();
-
-
+            FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            String userID = currentFirebaseUser.getUid();
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference databaseReference = database
                     .getReference(userID)
@@ -63,6 +63,12 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
                         Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
                         iv.add(listdata);
+
+                        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+                        int[] widgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, FridgeWidget.class));
+                        assert widgetIds != null;
+                        appWidgetManager.notifyAppWidgetViewDataChanged(widgetIds, R.id.listViewWidget);
+
                     }
                 }
 
@@ -83,9 +89,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     }
 
     @Override
-    public void onCreate() {
-
-    }
+    public void onCreate() { }
 
     @Override
     public void onDataSetChanged() {
@@ -99,7 +103,6 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
     @Override
     public int getCount() {
-        //Log.d("TAG", "Total count is " + cl.size());
         return iv.size();
     }
 

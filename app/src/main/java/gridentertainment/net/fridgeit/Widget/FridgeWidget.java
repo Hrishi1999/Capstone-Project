@@ -27,12 +27,8 @@ public class FridgeWidget extends AppWidgetProvider {
         CharSequence title = context.getString(R.string.widget_title);
         views.setTextViewText(R.id.widget_title, title);
         setRemoteAdapter(context, views);
-        Intent intent = new Intent(context, MainActivity.class);
-        PendingIntent appPendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        views.setPendingIntentTemplate(R.id.listViewWidget, appPendingIntent);
-        appWidgetManager.updateAppWidget(appWidgetId, views);
 
-        Intent intentUpdate = new Intent(context, WidgetService.class);
+        /*Intent intentUpdate = new Intent(context, WidgetService.class);
         intentUpdate.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         int[] idArray = new int[]{appWidgetId};
         intentUpdate.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, idArray);
@@ -42,15 +38,19 @@ public class FridgeWidget extends AppWidgetProvider {
         views.setOnClickPendingIntent(R.id.widget_title, pendingUpdate);
 
         appWidgetManager.updateAppWidget(appWidgetId, views);
+        */
+        appWidgetManager.updateAppWidget(appWidgetId, views);
 
     }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.listViewWidget);
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
             Toast.makeText(context, "This is called", Toast.LENGTH_SHORT).show();
+
         }
     }
 
@@ -64,7 +64,6 @@ public class FridgeWidget extends AppWidgetProvider {
 
     private static void setRemoteAdapter(Context context, @NonNull final RemoteViews views) {
         views.setRemoteAdapter(R.id.listViewWidget, new Intent(context, WidgetService.class));
-
     }
 }
 
