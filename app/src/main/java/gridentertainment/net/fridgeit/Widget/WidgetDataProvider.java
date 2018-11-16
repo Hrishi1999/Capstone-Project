@@ -63,13 +63,12 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
                         Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
                         iv.add(listdata);
-
-                        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-                        int[] widgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, FridgeWidget.class));
-                        assert widgetIds != null;
-                        appWidgetManager.notifyAppWidgetViewDataChanged(widgetIds, R.id.listViewWidget);
-
                     }
+                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+                    int[] widgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, FridgeWidget.class));
+                    assert widgetIds != null;
+                    appWidgetManager.notifyAppWidgetViewDataChanged(widgetIds, R.id.listViewWidget);
+
                 }
 
                 @Override
