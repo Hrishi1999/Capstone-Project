@@ -1,16 +1,23 @@
 package gridentertainment.net.fridgeit.UI;
 
 import android.app.ProgressDialog;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -38,6 +45,7 @@ import java.util.Timer;
 import gridentertainment.net.fridgeit.Adapter.InvAdapter;
 import gridentertainment.net.fridgeit.Models.InventoryItem;
 import gridentertainment.net.fridgeit.R;
+import gridentertainment.net.fridgeit.Widget.FridgeWidget;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,6 +56,13 @@ public class MainActivity extends AppCompatActivity {
     boolean doubleBackToExitPressedOnce = false;
     InvAdapter recycler;
 
+    private Paint mClearPaint;
+    private ColorDrawable mBackground;
+    private int backgroundColor;
+    private Drawable deleteDrawable;
+    private int intrinsicWidth;
+    private int intrinsicHeight;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,11 +72,21 @@ public class MainActivity extends AppCompatActivity {
         String userID = currentFirebaseUser.getUid();
 
         database = FirebaseDatabase.getInstance();
-        if(savedInstanceState==null)
+        databaseReference = database.getReference(userID).child("items");
+
+        if(database==null)
         {
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         }
-        databaseReference = database.getReference(userID).child("items");
+
+        mBackground = new ColorDrawable();
+        backgroundColor = Color.parseColor("#b80f0a");
+        mClearPaint = new Paint();
+        mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        deleteDrawable = ContextCompat.getDrawable(this, R.drawable.ic_delete_black_24dp);
+        intrinsicWidth = deleteDrawable.getIntrinsicWidth();
+        intrinsicHeight = deleteDrawable.getIntrinsicHeight();
+
         final ProgressDialog nDialog;
         nDialog = new ProgressDialog(this);
         nDialog.setMessage("Loading..");
@@ -113,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,  ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,  ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 //awesome code when user grabs recycler card to reorder
@@ -128,9 +153,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                if (direction == ItemTouchHelper.RIGHT) {
+                if (direction == ItemTouchHelper.LEFT) {
                     final String name = inventoryItemList.get(viewHolder.getAdapterPosition()).getName();
-                    Toast.makeText(MainActivity.this, name, Toast.LENGTH_SHORT).show();
                     Query query = databaseReference
                             .orderByChild("name")
                             .equalTo(name);
@@ -138,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
                     query.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-                            final java.util.Timer timer = new Timer();
                             Snackbar snackbar = Snackbar
                                     .make(recyclerView, "Remove Item?", Snackbar.LENGTH_LONG)
                                     .setAction("Undo", new View.OnClickListener() {
@@ -159,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     });
                             snackbar.show();
-
                         }
 
                         @Override
@@ -168,33 +190,48 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
 
-                    query.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
                 }
-                if (direction == ItemTouchHelper.LEFT) {
-                    Intent i = new Intent(MainActivity.this, EditViewActivity.class);
-                    InventoryItem inventoryItem = new InventoryItem();
-                    int pos = viewHolder.getAdapterPosition();
-                    inventoryItem.setPrice(inventoryItemList.get(pos).getPrice());
-                    inventoryItem.setExpiryDate(inventoryItemList.get(pos).getExpiryDate());
-                    inventoryItem.setName(inventoryItemList.get(pos).getName());
-                    inventoryItem.setQuantity(inventoryItemList.get(pos).getQuantity());
-                    i.putExtra("model", inventoryItem);
-                    startActivity(i);
+
+            }
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
+                View itemView = viewHolder.itemView;
+                int itemHeight = itemView.getHeight();
+
+                boolean isCancelled = dX == 0 && !isCurrentlyActive;
+
+                if (isCancelled) {
+                    clearCanvas(c, itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                    return;
                 }
+
+                mBackground.setColor(backgroundColor);
+                mBackground.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
+                mBackground.draw(c);
+
+                int deleteIconTop = itemView.getTop() + (itemHeight - intrinsicHeight) / 2;
+                int deleteIconMargin = (itemHeight - intrinsicHeight) / 2;
+                int deleteIconLeft = itemView.getRight() - deleteIconMargin - intrinsicWidth;
+                int deleteIconRight = itemView.getRight() - deleteIconMargin;
+                int deleteIconBottom = deleteIconTop + intrinsicHeight;
+
+                deleteDrawable.setBounds(deleteIconLeft, deleteIconTop, deleteIconRight, deleteIconBottom);
+                deleteDrawable.draw(c);
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }
         };
+
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    private void clearCanvas(Canvas c, Float left, Float top, Float right, Float bottom) {
+        c.drawRect(left, top, right, bottom, mClearPaint);
+
     }
 
     @Override

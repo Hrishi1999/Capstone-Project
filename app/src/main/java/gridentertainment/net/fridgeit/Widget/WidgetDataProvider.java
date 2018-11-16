@@ -32,7 +32,6 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
     private void initializeData() throws NullPointerException {
 
-
         try {
 
             iv.clear();
@@ -63,11 +62,12 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
                         Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
                         iv.add(listdata);
+
                     }
+
                     AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
                     int[] widgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, FridgeWidget.class));
                     appWidgetManager.notifyAppWidgetViewDataChanged(widgetIds, R.id.listViewWidget);
-
                 }
 
                 @Override
@@ -96,7 +96,6 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
     @Override
     public void onDestroy() {
-
     }
 
     @Override
