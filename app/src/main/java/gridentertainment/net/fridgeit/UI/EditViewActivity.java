@@ -105,7 +105,6 @@ public class EditViewActivity extends AppCompatActivity {
             }
         });
 
-
     }
 
     @Override

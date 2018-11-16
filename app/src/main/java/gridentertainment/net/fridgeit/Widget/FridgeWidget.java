@@ -38,7 +38,8 @@ public class FridgeWidget extends AppWidgetProvider {
         views.setOnClickPendingIntent(R.id.widget_title, pendingUpdate);
 
         appWidgetManager.updateAppWidget(appWidgetId, views);
-        */
+        ComponentName thisWidget = new ComponentName( context, WidgetService.class);
+        AppWidgetManager.getInstance( context ).updateAppWidget(thisWidget, views);*/
         appWidgetManager.updateAppWidget(appWidgetId, views);
 
     }
