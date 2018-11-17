@@ -65,9 +65,6 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
                     }
 
-                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-                    int[] widgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, FridgeWidget.class));
-                    appWidgetManager.notifyAppWidgetViewDataChanged(widgetIds, R.id.listViewWidget);
                 }
 
                 @Override
