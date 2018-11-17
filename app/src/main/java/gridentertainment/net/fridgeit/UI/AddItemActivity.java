@@ -144,21 +144,16 @@ public class AddItemActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // todo use appropriate resultCode in your case
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == FragmentActivity.RESULT_OK) {
             if (data.getData() != null) {
-                // this case will occur in case of picking image from the Gallery,
-                // but not when taking picture with a camera
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
                     processBarcode(bitmap);
-                    // do whatever you want with the Bitmap ....
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             } else {
-                // this case will occur when taking a picture with a camera
                 Bitmap bitmap = null;
                 Cursor cursor = this.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                         new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media.DATE_ADDED,
@@ -175,13 +170,9 @@ public class AddItemActivity extends AppCompatActivity {
                 }
 
                 if (bitmap == null) {
-                    // for safety reasons you can
-                    // use thumbnail if not retrieved full sized image
                     bitmap = (Bitmap) data.getExtras().get("data");
                     processBarcode(bitmap);
                 }
-
-                // do whatever you want with the Bitmap ....
             }
 
             super.onActivityResult(requestCode, resultCode, data);

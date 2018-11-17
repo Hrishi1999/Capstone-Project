@@ -1,10 +1,11 @@
 package gridentertainment.net.fridgeit.Widget;
 
+import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -21,7 +22,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import gridentertainment.net.fridgeit.Models.InventoryItem;
 import gridentertainment.net.fridgeit.R;
@@ -31,10 +31,15 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     private final Intent intent;
     private List<InventoryItem> iv = new ArrayList<>();
     private Context context;
-    private CountDownLatch doneSignal = new CountDownLatch(1);
 
-    private void initializeData() throws NullPointerException, InterruptedException {
-        doneSignal.await();
+    private void initializeData() {
+
+        iv = intent.getParcelableArrayListExtra("list");
+
+       /* AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        int[] widgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, FridgeWidget.class));
+        appWidgetManager.notifyAppWidgetViewDataChanged(widgetIds, R.id.listViewWidget);*/
+
     }
 
     public WidgetDataProvider(Context context, Intent intent)
@@ -44,11 +49,12 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     }
 
     @Override
-    public void onCreate() {}
+    public void onCreate() {
+    }
 
     @Override
     public void onDataSetChanged() {
-        new initData().execute();
+        initializeData();
     }
 
     @Override
@@ -57,8 +63,6 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
     @Override
     public int getCount() {
-        Toast.makeText(context, iv.get(0).getName(), Toast.LENGTH_SHORT).show();
-        doneSignal.countDown();
         return iv.size();
     }
 
@@ -88,82 +92,5 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     @Override
     public boolean hasStableIds() {
         return true;
-    }
-
-    private class initData extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            try {
-                Toast.makeText(context, "Here", Toast.LENGTH_SHORT).show();
-                iv.clear();
-                FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                String userID = currentFirebaseUser.getUid();
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference databaseReference = database
-                        .getReference(userID)
-                        .child("items");
-
-                databaseReference.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for(DataSnapshot dataSnapshot1 :dataSnapshot.getChildren()){
-
-                            InventoryItem inventoryItems = dataSnapshot1.getValue(InventoryItem.class);
-                            InventoryItem listdata = new InventoryItem();
-
-                            String name = inventoryItems.getName();
-                            String quantity = inventoryItems.getQuantity();
-                            String address=inventoryItems.getExpiryDate();
-                            String price=inventoryItems.getPrice();
-
-                            listdata.setName(name);
-                            listdata.setQuantity(quantity);
-                            listdata.setExpiryDate(address);
-                            listdata.setPrice(price);
-
-                            Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
-                            iv.add(listdata);
-
-                        }
-                    /*
-                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-                    int[] widgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, FridgeWidget.class));
-                    appWidgetManager.notifyAppWidgetViewDataChanged(widgetIds, R.id.listViewWidget);*/
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            try {
-                doneSignal.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            doneSignal.countDown();
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            int[] widgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, FridgeWidget.class));
-            appWidgetManager.notifyAppWidgetViewDataChanged(widgetIds, R.id.listViewWidget);
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-
-        }
     }
 }

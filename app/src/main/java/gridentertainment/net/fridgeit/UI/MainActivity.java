@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     List<InventoryItem> inventoryItemList;
     RecyclerView recyclerView;
     boolean doubleBackToExitPressedOnce = false;
-    InvAdapter recycler;
+    InvAdapter invAdapter;
 
     private Paint mClearPaint;
     private ColorDrawable mBackground;
@@ -72,12 +72,11 @@ public class MainActivity extends AppCompatActivity {
         String userID = currentFirebaseUser.getUid();
 
         database = FirebaseDatabase.getInstance();
-        databaseReference = database.getReference(userID).child("items");
-
-        if(database==null)
+        if(savedInstanceState==null)
         {
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            database.setPersistenceEnabled(true);
         }
+        databaseReference = database.getReference(userID).child("items");
 
         mBackground = new ColorDrawable();
         backgroundColor = Color.parseColor("#b80f0a");
@@ -123,11 +122,11 @@ public class MainActivity extends AppCompatActivity {
                     inventoryItemList.add(listdata);
                 }
 
-                recycler = new InvAdapter(inventoryItemList);
+                invAdapter = new InvAdapter(inventoryItemList);
                 RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MainActivity.this);
                 recyclerView.setLayoutManager(layoutmanager);
                 recyclerView.setItemAnimator( new DefaultItemAnimator());
-                recyclerView.setAdapter(recycler);
+                recyclerView.setAdapter(invAdapter);
                 nDialog.dismiss();
             }
 
@@ -167,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                                     .setAction("Undo", new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
-                                            recycler.notifyDataSetChanged();
+                                            invAdapter.notifyDataSetChanged();
                                         }
                                     })
                                     .setCallback(new Snackbar.Callback() {
