@@ -58,12 +58,32 @@
     <string name="cnt_price">Price of the product</string>
     <string name="cnt_bcd">Scan barcode</string>
     <string name="cnt_add">Add Item</string>
+
     <string name="tst_enter_pwd">Enter password!</string>
     <string name="tst_email_id">Enter email address!</string>
     <string name="tst_pwd_shrt">Password too short, enter minimum 6 characters!</string>
+
     <string name="auth_failed_tst">Authentication failed.</string>
     <string name="rst_id">Enter your registered email id</string>
     <string name="rst_inst">We have sent you instructions to reset your password!</string>
     <string name="rst_failed">Failed to send reset email!</string>
+
+    <string name="txt_permission">Please grant permissions.</string>
+    <string name="KEY_LIST">list</string>
+    <string name="ada_expiring">Expiring in&#160;</string>
+    <string name="ada_date">&#160;days</string>
+    <string name="ada_quantity">Quantity:&#160;</string>
+    <string name="ada_price">Price:&#160;</string>
+    <string name="KEY_MODEL">model</string>
+    <string name="itm_exists">Item already exists</string>
+    <string name="err_bcd">Barcode Detector not functional, please wait for sometime</string>
+    <string name="err_nobcd">No barcode detected</string>
+    <string name="dialog_msg">Hold on!</string>
+    <string name="main_loading">Loading..</string>
+    <string name="main_getdata">Getting Data</string>
+    <string name="main_removeitm">Remove Item?</string>
+    <string name="main_undo">Undo</string>
+    <string name="info_exit">Please click BACK again to exit</string>
+    <string name="sign_up">Sign Up</string>
 
 </resources>

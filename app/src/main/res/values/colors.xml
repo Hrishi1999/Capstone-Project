@@ -17,4 +17,10 @@
     <color name="btn_login_bg">#eceef1</color>
     <color name="lbl_name">#333333</color>
     <color name="btn_logut_bg">#ff6861</color>
+
+    <color name="ada_red">#d50000</color>
+    <color name="ada_yellow">#f57f17</color>
+    <color name="ada_green">#2e7d32</color>
+    <color name="itm_remove">#b80f0a</color>
+
 </resources>

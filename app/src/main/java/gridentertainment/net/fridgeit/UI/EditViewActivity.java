@@ -2,11 +2,8 @@ package gridentertainment.net.fridgeit.UI;
 
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
@@ -19,14 +16,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Timer;
-
 import gridentertainment.net.fridgeit.Models.InventoryItem;
+
 import gridentertainment.net.fridgeit.R;
 
 public class EditViewActivity extends AppCompatActivity {
 
     private InventoryItem inventoryItem;
+    private final static String KEY_NAME = "name";
+    private final static String KEY_ITEM = "items";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +33,12 @@ public class EditViewActivity extends AppCompatActivity {
 
         if(savedInstanceState != null)
         {
-            inventoryItem = savedInstanceState.getParcelable("model");
+            inventoryItem = savedInstanceState.getParcelable(getString(R.string.KEY_MODEL));
         }
         else
         {
             Bundle bundle = getIntent().getExtras();
-            inventoryItem = bundle.getParcelable("model");
+            inventoryItem = bundle.getParcelable(getString(R.string.KEY_MODEL));
         }
 
 
@@ -66,31 +64,22 @@ public class EditViewActivity extends AppCompatActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Query query = databaseReference.child("items")
-                        .orderByChild("name")
+                Query query = databaseReference.child(KEY_ITEM)
+                        .orderByChild(KEY_NAME)
                         .equalTo(name.getText().toString());
 
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                         for (DataSnapshot appleSnapshot : dataSnapshot.getChildren()) {
                             appleSnapshot.getRef().removeValue();
                         }
-
                         inventoryItem1.setQuantity(quantity.getText().toString());
                         inventoryItem1.setName(name.getText().toString());
                         inventoryItem1.setExpiryDate(date.getText().toString());
                         inventoryItem1.setPrice(price.getText().toString());
-
-                        /*Map<String, Object> updates = new HashMap<String,Object>();
-                        updates.put("name", name.getText().toString());
-                        updates.put("quantity", quantity.getText().toString());
-                        updates.put("expiryDate", date.getText().toString());
-                        updates.put("price", price.getText().toString());
-
-                        databaseReference.child("items").updateChildren(updates);
-                        finish();*/
-                        databaseReference.child("items")
+                        databaseReference.child(KEY_ITEM)
                                 .child(key)
                                 .setValue(inventoryItem1);
                         finish();
@@ -101,16 +90,13 @@ public class EditViewActivity extends AppCompatActivity {
 
                     }
                 });
-
             }
         });
-
-
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putParcelable("model", inventoryItem);
+        savedInstanceState.putParcelable(getString(R.string.KEY_MODEL), inventoryItem);
     }
 }

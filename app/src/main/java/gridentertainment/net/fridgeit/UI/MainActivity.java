@@ -1,13 +1,8 @@
 package gridentertainment.net.fridgeit.UI;
 
 import android.app.ProgressDialog;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -24,8 +19,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -40,12 +33,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 
 import gridentertainment.net.fridgeit.Adapter.InvAdapter;
 import gridentertainment.net.fridgeit.Models.InventoryItem;
 import gridentertainment.net.fridgeit.R;
-import gridentertainment.net.fridgeit.Widget.FridgeWidget;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -63,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
     private int intrinsicWidth;
     private int intrinsicHeight;
 
+    public final static String KEY_NAME = "name";
+    public final static String KEY_ITEM = "items";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         String userID = currentFirebaseUser.getUid();
 
         database = FirebaseDatabase.getInstance();
-        databaseReference = database.getReference(userID).child("items");
+        databaseReference = database.getReference(userID).child(KEY_ITEM);
 
         if(database==null)
         {
@@ -80,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mBackground = new ColorDrawable();
-        backgroundColor = Color.parseColor("#b80f0a");
+        backgroundColor = getColor(R.color.itm_remove);
         mClearPaint = new Paint();
         mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         deleteDrawable = ContextCompat.getDrawable(this, R.drawable.ic_delete_black_24dp);
@@ -89,8 +83,8 @@ public class MainActivity extends AppCompatActivity {
 
         final ProgressDialog nDialog;
         nDialog = new ProgressDialog(this);
-        nDialog.setMessage("Loading..");
-        nDialog.setTitle("Get Data");
+        nDialog.setMessage(getString(R.string.main_loading));
+        nDialog.setTitle(getString(R.string.main_getdata));
         nDialog.show();
 
         recyclerView = findViewById(R.id.recyclerViewMain);
@@ -102,8 +96,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AddItemActivity.class));
             }
         });
+
         //I don't think it is necessary to use onSavedInstance here,
         //Firebase handles persistence. Is it fine?
+
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -123,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                     inventoryItemList.add(listdata);
                 }
 
-                recycler = new InvAdapter(inventoryItemList);
+                recycler = new InvAdapter(inventoryItemList, getApplicationContext());
                 RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MainActivity.this);
                 recyclerView.setLayoutManager(layoutmanager);
                 recyclerView.setItemAnimator( new DefaultItemAnimator());
@@ -156,15 +152,15 @@ public class MainActivity extends AppCompatActivity {
                 if (direction == ItemTouchHelper.LEFT) {
                     final String name = inventoryItemList.get(viewHolder.getAdapterPosition()).getName();
                     Query query = databaseReference
-                            .orderByChild("name")
+                            .orderByChild(KEY_NAME)
                             .equalTo(name);
 
                     query.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                             Snackbar snackbar = Snackbar
-                                    .make(recyclerView, "Remove Item?", Snackbar.LENGTH_LONG)
-                                    .setAction("Undo", new View.OnClickListener() {
+                                    .make(recyclerView, R.string.main_removeitm, Snackbar.LENGTH_LONG)
+                                    .setAction(R.string.main_undo, new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
                                             recycler.notifyDataSetChanged();
@@ -247,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.info_exit), Toast.LENGTH_SHORT).show();
 
         new Handler().postDelayed(new Runnable() {
 

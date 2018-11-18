@@ -23,7 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:context=".MainActivity"
-        tools:showIn="@layout/activity_main"></android.support.v7.widget.RecyclerView>
+        tools:showIn="@layout/activity_main" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_add"

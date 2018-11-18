@@ -1,8 +1,8 @@
 package gridentertainment.net.fridgeit.Adapter;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,9 +24,12 @@ import gridentertainment.net.fridgeit.UI.EditViewActivity;
 public class InvAdapter extends RecyclerView.Adapter<InvAdapter.InvHolder>{
 
     private List<InventoryItem> listdata;
+    private Context context;
 
-    public InvAdapter(List<InventoryItem> listdata) {
+    public InvAdapter(List<InventoryItem> listdata, Context context)
+    {
         this.listdata = listdata;
+        this.context = context;
     }
 
     @NonNull
@@ -35,7 +38,6 @@ public class InvAdapter extends RecyclerView.Adapter<InvAdapter.InvHolder>{
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.inventory_item2,parent,false);
         return new InvHolder(view);
     }
-
 
     @SuppressLint({"SetTextI18n", "SimpleDateFormat"})
     public void onBindViewHolder(@NonNull InvHolder holder, int position) {
@@ -64,22 +66,24 @@ public class InvAdapter extends RecyclerView.Adapter<InvAdapter.InvHolder>{
         {
             if(days <= 10)
             {
-                holder.date.setTextColor(Color.parseColor("#d50000"));
-                holder.date.setText("Expiring in " + inDays + " days");
+                holder.date.setTextColor(context.getColor(R.color.ada_red));
+                holder.date.setText(context.getString(R.string.ada_expiring) + inDays
+                        + context.getString(R.string.ada_date));
             }
             if(days <= 30 && days >= 11)
             {
-                holder.date.setTextColor(Color.parseColor("#f57f17"));
-                holder.date.setText("Expiring in " + inDays + " days");
-            }
+                holder.date.setTextColor(context.getColor(R.color.ada_yellow));
+                holder.date.setText(context.getString(R.string.ada_expiring) + inDays
+                        + context.getString(R.string.ada_date));            }
             if(days >= 30)
             {
-                holder.date.setTextColor(Color.parseColor("#2e7d32"));
-                holder.date.setText("Expiring in " + inDays + " days");
-            }
+                holder.date.setTextColor(context.getColor(R.color.ada_green));
+                holder.date.setText(context.getString(R.string.ada_expiring) + inDays
+                        + context.getString(R.string.ada_date));            }
             if(days<0)
             {
-                holder.date.setText("Expired " + inDays + " days ago");
+                holder.date.setText(context.getString(R.string.ada_expiring) + inDays
+                        + context.getString(R.string.ada_date));
             }
         }
         else
@@ -88,8 +92,8 @@ public class InvAdapter extends RecyclerView.Adapter<InvAdapter.InvHolder>{
         }
 
         holder.name.setText(name);
-        holder.quantity.setText("Quantity: " + quantity);
-        holder.price.setText("Price : " + price);
+        holder.quantity.setText(context.getString(R.string.ada_quantity) + quantity);
+        holder.price.setText(context.getString(R.string.ada_price) + price);
 
         if(name.isEmpty())
         {
@@ -115,8 +119,7 @@ public class InvAdapter extends RecyclerView.Adapter<InvAdapter.InvHolder>{
                 inventoryItem.setExpiryDate(date);
                 inventoryItem.setName(name);
                 inventoryItem.setQuantity(quantity);
-
-                i.putExtra("model", inventoryItem);
+                i.putExtra(context.getString(R.string.KEY_MODEL), inventoryItem);
                 view.getContext().startActivity(i);
             }
         });

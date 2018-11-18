@@ -1,22 +1,9 @@
 package gridentertainment.net.fridgeit.Widget;
 
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-import android.widget.Toast;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,50 +18,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     private Context context;
 
     private void initializeData() throws NullPointerException {
-
-        try {
-
-            iv.clear();
-            FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-            String userID = currentFirebaseUser.getUid();
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference databaseReference = database
-                    .getReference(userID)
-                    .child("items");
-
-            databaseReference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for(DataSnapshot dataSnapshot1 :dataSnapshot.getChildren()){
-
-                        InventoryItem inventoryItems = dataSnapshot1.getValue(InventoryItem.class);
-                        InventoryItem listdata = new InventoryItem();
-
-                        String name = inventoryItems.getName();
-                        String quantity = inventoryItems.getQuantity();
-                        String address=inventoryItems.getExpiryDate();
-                        String price=inventoryItems.getPrice();
-
-                        listdata.setName(name);
-                        listdata.setQuantity(quantity);
-                        listdata.setExpiryDate(address);
-                        listdata.setPrice(price);
-
-                        Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
-                        iv.add(listdata);
-
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
+        iv = intent.getParcelableArrayListExtra(context.getString(R.string.KEY_LIST));
     }
 
     public WidgetDataProvider(Context context, Intent intent)
@@ -102,6 +46,10 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
     @Override
     public RemoteViews getViewAt(int position) {
+
+        if (position >= getCount()){
+            return getLoadingView();
+        }
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.fridge_widget_item);
         remoteViews.setTextViewText(R.id.wd_item, iv.get(position).getName());
         remoteViews.setTextViewText(R.id.wd_measure, iv.get(position).getQuantity());
